@@ -152,7 +152,7 @@ define KernelPackage/nf-flow
 	CONFIG_NETFILTER_INGRESS=y \
 	CONFIG_NF_FLOW_TABLE \
 	CONFIG_NF_FLOW_TABLE_HW
-  DEPENDS:=+kmod-nf-conntrack @!LINUX_3_18 @!LINUX_4_9
+  DEPENDS:=+kmod-nf-conntrack @!LINUX_4_9
   FILES:= \
 	$(LINUX_DIR)/net/netfilter/nf_flow_table.ko \
 	$(LINUX_DIR)/net/netfilter/nf_flow_table_hw.ko
@@ -330,6 +330,7 @@ define KernelPackage/ipt-ipset
 	CONFIG_IP_SET_BITMAP_IPMAC \
 	CONFIG_IP_SET_BITMAP_PORT \
 	CONFIG_IP_SET_HASH_IP \
+	CONFIG_IP_SET_HASH_IPMAC \
 	CONFIG_IP_SET_HASH_IPMARK \
 	CONFIG_IP_SET_HASH_IPPORT \
 	CONFIG_IP_SET_HASH_IPPORTIP \
@@ -560,69 +561,6 @@ endef
 $(eval $(call KernelPackage,nf-nathelper-extra))
 
 
-define KernelPackage/ipt-imq
-  TITLE:=Intermediate Queueing support
-  KCONFIG:= \
-	CONFIG_IMQ \
-	CONFIG_IMQ_NUM_DEVS=2 \
-	CONFIG_NETFILTER_XT_TARGET_IMQ
-  FILES:= \
-	$(LINUX_DIR)/drivers/net/imq.$(LINUX_KMOD_SUFFIX) \
-	$(foreach mod,$(IPT_IMQ-m),$(LINUX_DIR)/net/$(mod).$(LINUX_KMOD_SUFFIX))
-  AUTOLOAD:=$(call AutoProbe,$(notdir imq $(IPT_IMQ-m)))
-  $(call AddDepends/ipt)
-endef
-
-define KernelPackage/ipt-imq/description
- Kernel support for Intermediate Queueing devices
-endef
-
-$(eval $(call KernelPackage,ipt-imq))
-
-define KernelPackage/ipt-bandwidth
-  SUBMENU:=$(NF_MENU)
-  TITLE:=bandwidth
-  KCONFIG:=$(KCONFIG_IPT_BANDWIDTH)
-  FILES:=$(LINUX_DIR)/net/ipv4/netfilter/*bandwidth*.$(LINUX_KMOD_SUFFIX)
-  AUTOLOAD:=$(call AutoLoad,$(notdir $(IPT_BANDWIDTH-m)))
-  DEPENDS:= kmod-ipt-core
-endef
-
-$(eval $(call KernelPackage,ipt-bandwidth))
-
-define KernelPackage/ipt-timerange
-  SUBMENU:=$(NF_MENU)
-  TITLE:=timerange
-  KCONFIG:=$(KCONFIG_IPT_TIMERANGE)
-  FILES:=$(LINUX_DIR)/net/ipv4/netfilter/*timerange*.$(LINUX_KMOD_SUFFIX)
-  AUTOLOAD:=$(call AutoLoad,$(notdir $(IPT_TIMERANGE-m)))
-  DEPENDS:= kmod-ipt-core
-endef
-
-$(eval $(call KernelPackage,ipt-timerange))
-
-define KernelPackage/ipt-webmon
-  SUBMENU:=$(NF_MENU)
-  TITLE:=webmon
-  KCONFIG:=$(KCONFIG_IPT_WEBMON)
-  FILES:=$(LINUX_DIR)/net/ipv4/netfilter/*webmon*.$(LINUX_KMOD_SUFFIX)
-  AUTOLOAD:=$(call AutoLoad,$(notdir $(IPT_WEBMON-m)))
-  DEPENDS:= kmod-ipt-core
-endef
-
-$(eval $(call KernelPackage,ipt-webmon))
-
-define KernelPackage/ipt-weburl
-  SUBMENU:=$(NF_MENU)
-  TITLE:=weburl
-  KCONFIG:=$(KCONFIG_IPT_WEBURL)
-  FILES:=$(LINUX_DIR)/net/ipv4/netfilter/*weburl*.$(LINUX_KMOD_SUFFIX)
-  AUTOLOAD:=$(call AutoLoad,$(notdir $(IPT_WEBURL-m)))
-  DEPENDS:= kmod-ipt-core
-endef
-
-$(eval $(call KernelPackage,ipt-weburl))
-
 define KernelPackage/ipt-ulog
   TITLE:=Module for user-space packet logging
   KCONFIG:=$(KCONFIG_IPT_ULOG)
@@ -709,6 +647,8 @@ define KernelPackage/ipt-tproxy
   TITLE:=Transparent proxying support
   DEPENDS+=+kmod-ipt-conntrack +IPV6:kmod-nf-conntrack6 +IPV6:kmod-ip6tables
   KCONFIG:= \
+  	CONFIG_NF_SOCKET_IPV4 \
+  	CONFIG_NF_SOCKET_IPV6 \
   	CONFIG_NETFILTER_XT_MATCH_SOCKET \
   	CONFIG_NETFILTER_XT_TARGET_TPROXY
   FILES:= \

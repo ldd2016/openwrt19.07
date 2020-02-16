@@ -8,9 +8,9 @@ PKG_LICENSE_FILES:=
 
 PKG_SOURCE_URL:=https://github.com/openwrt/mt76
 PKG_SOURCE_PROTO:=git
-PKG_SOURCE_DATE:=2019-07-16
-PKG_SOURCE_VERSION:=3d7f7384bef0950ceea3a8c96ce79333d208e07d
-PKG_MIRROR_HASH:=17e6a96817a77165a24a05f4b8bfc4019d3c8767d0dc96d8a933a81bb9c44dd3
+PKG_SOURCE_DATE:=2020-01-04
+PKG_SOURCE_VERSION:=8a78567983a16869b77a0254b4917027df4a7ad9
+PKG_MIRROR_HASH:=0cc48bc7093b99dc7f43a5a83a3a00d205709326f529b91b0b14fe0d89cb783d
 
 PKG_MAINTAINER:=Felix Fietkau <nbd@nbd.name>
 PKG_BUILD_PARALLEL:=1
@@ -246,12 +246,12 @@ define KernelPackage/mt7603/install
 endef
 
 define KernelPackage/mt7615e/install
-	$(INSTALL_DIR) $(1)/lib/firmware
+	$(INSTALL_DIR) $(1)/lib/firmware/mediatek
 	cp \
 		$(PKG_BUILD_DIR)/firmware/mt7615_cr4.bin \
 		$(PKG_BUILD_DIR)/firmware/mt7615_n9.bin \
 		$(PKG_BUILD_DIR)/firmware/mt7615_rom_patch.bin \
-		$(1)/lib/firmware
+		$(1)/lib/firmware/mediatek
 endef
 
 $(eval $(call KernelPackage,mt76-core))
