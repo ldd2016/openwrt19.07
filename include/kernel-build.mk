@@ -178,4 +178,3 @@ define BuildKernel
   prereq: image-prereq
 
 endef
-
