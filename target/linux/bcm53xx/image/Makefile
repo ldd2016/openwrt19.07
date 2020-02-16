@@ -83,6 +83,13 @@ define Build/asus-trx
 	mv $@.new $@
 endef
 
+define Build/luxul-lxl
+	$(STAGING_DIR_HOST)/bin/lxlfw create $@.new \
+		-i $@ \
+		-b $(LUXUL_BOARD)
+	mv $@.new $@
+endef
+
 define Build/seama-nand
 	# Seama entity
 	$(STAGING_DIR_HOST)/bin/oseama \
@@ -102,12 +109,13 @@ endef
 
 DEVICE_VARS += PRODUCTID SIGNATURE NETGEAR_BOARD_ID NETGEAR_REGION TPLINK_BOARD
 DEVICE_VARS += BUFFALO_TAG_PLATFORM BUFFALO_TAG_VERSION BUFFALO_TAG_MINOR
+DEVICE_VARS += LUXUL_BOARD
 
 IEEE8021X := wpad-basic
 B43 := $(IEEE8021X) kmod-b43
 BRCMFMAC_43602A1 := $(IEEE8021X) kmod-brcmfmac brcmfmac-firmware-43602a1-pcie
 BRCMFMAC_4366B1 := $(IEEE8021X) kmod-brcmfmac brcmfmac-firmware-4366b1-pcie
-BRCMFMAC_4366C0 := $(IEEE8021X) kmod-brcmfmac k3wifi
+BRCMFMAC_4366C0 := $(IEEE8021X) kmod-brcmfmac brcmfmac-firmware-4366c0-pcie
 USB2_PACKAGES := kmod-usb-ohci kmod-usb2 kmod-phy-bcm-ns-usb2
 USB2_PACKAGES += kmod-usb-ledtrig-usbport
 USB3_PACKAGES := $(USB2_PACKAGES) kmod-usb3 kmod-phy-bcm-ns-usb3
@@ -249,6 +257,27 @@ define Device/linksys-ea9500
 endef
 # TARGET_DEVICES += linksys-ea9500
 
+define Device/luxul
+  IMAGES := lxl
+  IMAGE/lxl := append-ubi | trx-nand | luxul-lxl
+endef
+
+define Device/luxul-abr-4500
+  $(Device/luxul)
+  DEVICE_TITLE := Luxul ABR-4500
+  DEVICE_PACKAGES := $(USB3_PACKAGES)
+  LUXUL_BOARD := ABR-4500
+endef
+TARGET_DEVICES += luxul-abr-4500
+
+define Device/luxul-xbr-4500
+  $(Device/luxul)
+  DEVICE_TITLE := Luxul XBR-4500
+  DEVICE_PACKAGES := $(USB3_PACKAGES)
+  LUXUL_BOARD := XBR-4500
+endef
+TARGET_DEVICES += luxul-xbr-4500
+
 define Device/netgear
   IMAGES := chk
   IMAGE/chk := append-ubi | trx-nand | netgear-chk
@@ -315,22 +344,10 @@ TARGET_DEVICES += smartrg-sr400ac
 
 define Device/phicomm-k3
   DEVICE_TITLE := PHICOMM K3
-  DEVICE_PACKAGES := $(BRCMFMAC_4366C0) $(USB3_PACKAGES) k3screenctrl
+  DEVICE_PACKAGES := $(BRCMFMAC_4366C0) $(USB3_PACKAGES)
   IMAGES := trx
 endef
 TARGET_DEVICES += phicomm-k3
-
-define Device/arris-sbr-ac1900p
-  DEVICE_TITLE := ARRIS SBR-AC1900P
-  DEVICE_PACKAGES := $(USB3_PACKAGES)
-endef
-TARGET_DEVICES += arris-sbr-ac1900p
-
-define Device/arris-sbr-ac3200p
-  DEVICE_TITLE := ARRIS SBR-AC3200P
-  DEVICE_PACKAGES := $(BRCMFMAC_43602A1) $(USB3_PACKAGES)
-endef
-TARGET_DEVICES += arris-sbr-ac3200p
 
 define Device/tenda-ac9
   DEVICE_TITLE := Tenda AC9
@@ -338,7 +355,7 @@ define Device/tenda-ac9
   IMAGES := trx
   IMAGE/trx := append-rootfs | trx-serial
 endef
-#TARGET_DEVICES += tenda-ac9
+TARGET_DEVICES += tenda-ac9
 
 define Device/tplink-archer-c5-v2
   DEVICE_TITLE := TP-LINK Archer C5 V2
@@ -347,7 +364,7 @@ define Device/tplink-archer-c5-v2
   IMAGE/bin := append-rootfs | bcm53xx-tplink-safeloader
   TPLINK_BOARD := ARCHER-C5-V2
 endef
-#TARGET_DEVICES += tplink-archer-c5-v2
+TARGET_DEVICES += tplink-archer-c5-v2
 
 define Device/tplink-archer-c9-v1
   DEVICE_TITLE := TP-LINK Archer C9 V1
@@ -356,6 +373,6 @@ define Device/tplink-archer-c9-v1
   IMAGE/bin := append-rootfs | bcm53xx-tplink-safeloader
   TPLINK_BOARD := ARCHERC9
 endef
-#TARGET_DEVICES += tplink-archer-c9-v1
+TARGET_DEVICES += tplink-archer-c9-v1
 
 $(eval $(call BuildImage))
